@@ -1,0 +1,52 @@
+# Environment variables
+.env
+*.env
+!env.template
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# User data (sensitive)
+user_data/
+
+# Data files (except sample data)
+*.csv
+!sample_data/*.csv
+*.xlsx
+*.xls
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+.cache/
+
+# Password generation script (contains plaintext passwords in comments)
+generate_passwords.py
+

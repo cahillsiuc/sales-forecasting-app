@@ -1,0 +1,23 @@
+credentials:
+  usernames:
+    admin:
+      email: admin@salesforecasting.com
+      name: Admin User
+      password: $2b$12$Ik6jvtR92Bno6YlPbNNPpu4arVmt.Xx/Ieth.jJPBwBt71zqYxEzK  # Password: Admin123!
+      role: admin
+    customer:
+      email: customer@example.com
+      name: Customer User
+      password: $2b$12$RhB.FNfY7cnWXJH7eR6TjOQufEAx3L2H7BZDbstwtvnLDnkf3qHyq  # Password: Customer123!
+      role: customer
+
+cookie:
+  expiry_days: 30
+  key: sales_forecasting_signature_key_abc123
+  name: sales_forecasting_cookie
+
+preauthorized:
+  emails:
+  - admin@salesforecasting.com
+  - customer@example.com
+
