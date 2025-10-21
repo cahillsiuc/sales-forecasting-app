@@ -1452,15 +1452,7 @@ def main():
                     st.error("Invalid username or password")
         
         st.info("""
-        **Demo Credentials:**
-        
-        **Customer Login:**
-        - Username: `customer`
-        - Password: `Customer123!`
-        
-        **Admin Login:**
-        - Username: `admin`
-        - Password: `Admin123!`
+        Please contact your administrator for login credentials.
         """)
         return
     
