@@ -874,57 +874,84 @@ def render_forecasting():
             products = st.multiselect("Select Products", df[st.session_state.selected_product_col].unique())
             customers = st.multiselect("Select Customers", df[st.session_state.selected_customer_col].unique())
             
-            # Generate forecast button
-            if st.button("🚀 Generate Forecast", type="primary", width='stretch'):
-                with st.spinner("Generating forecast..."):
-                    # Apply filters
-                    data = df.copy()
-                    if products:
-                        data = data[data[st.session_state.selected_product_col].isin(products)]
-                    if customers:
-                        data = data[data[st.session_state.selected_customer_col].isin(customers)]
+            # Validate required selections
+            required_selections = {
+                'Date Column': st.session_state.selected_date_col,
+                'Target Column': st.session_state.selected_target_col,
+                'Product Column': st.session_state.selected_product_col,
+                'Customer Column': st.session_state.selected_customer_col
+            }
+            
+            missing = [name for name, value in required_selections.items() if not value]
+            
+            # Display selection status
+            col1, col2 = st.columns([2, 1])
+            with col1:
+                if missing:
+                    st.warning(f"⚠️ Missing: {', '.join(missing)}")
+                else:
+                    st.success("✅ All selections complete!")
                     
-                    if len(data) == 0:
-                        st.error("❌ No data remaining after applying filters!")
-                        return
-                    
-                    # Convert date column
-                    data[st.session_state.selected_date_col] = pd.to_datetime(data[st.session_state.selected_date_col])
-                    
-                    # Aggregate data based on selection
-                    aggregated_data = aggregate_data(data, st.session_state.selected_date_col, st.session_state.selected_target_col, aggregation)
-                    
-                    # Generate forecast based on selected model
-                    if model_type == "Linear Regression":
-                        forecast_result = linear_regression_forecast(aggregated_data, st.session_state.selected_date_col, st.session_state.selected_target_col, periods, aggregation, annual_growth_rate, confidence_level)
-                    elif model_type == "Prophet":
-                        forecast_result = prophet_forecast(aggregated_data, st.session_state.selected_date_col, st.session_state.selected_target_col, periods, aggregation, annual_growth_rate, confidence_level)
-                    elif model_type == "Ensemble":
-                        forecast_result = ensemble_forecast(aggregated_data, st.session_state.selected_date_col, st.session_state.selected_target_col, periods, aggregation, annual_growth_rate, confidence_level)
-                    
-                    if forecast_result:
-                        # Store forecast data
-                        st.session_state.forecast_data = {
-                            'target_col': st.session_state.selected_target_col,
-                            'forecast_values': forecast_result['forecast_values'],
-                            'periods': periods,
-                            'period_label': period_label,
-                            'slope': forecast_result['slope'],
-                            'intercept': forecast_result['intercept'],
-                            'historical_data': aggregated_data.values.tolist(),
-                            'forecast_dates': forecast_result['forecast_dates'],
-                            'model_name': forecast_result['model_name'],
-                            'r2_score': forecast_result['r2_score'],
-                            'aggregation': aggregation,
-                            'annual_growth_rate': annual_growth_rate,
-                            'confidence_level': confidence_level,
-                            'original_data': data
-                        }
+            with col2:
+                if missing:
+                    # Disabled button
+                    st.button(
+                        "🚀 Generate Forecast", 
+                        disabled=True,
+                        help=f"Complete: {', '.join(missing)}"
+                    )
+                else:
+                    # Enabled button
+                    if st.button("🚀 Generate Forecast", type="primary", width='stretch'):
+                        with st.spinner("Generating forecast..."):
+                            # Apply filters
+                            data = df.copy()
+                            if products:
+                                data = data[data[st.session_state.selected_product_col].isin(products)]
+                            if customers:
+                                data = data[data[st.session_state.selected_customer_col].isin(customers)]
+                            
+                            if len(data) == 0:
+                                st.error("❌ No data remaining after applying filters!")
+                                return
+                            
+                            # Convert date column
+                            data[st.session_state.selected_date_col] = pd.to_datetime(data[st.session_state.selected_date_col])
+                            
+                            # Aggregate data based on selection
+                            aggregated_data = aggregate_data(data, st.session_state.selected_date_col, st.session_state.selected_target_col, aggregation)
+                            
+                            # Generate forecast based on selected model
+                            if model_type == "Linear Regression":
+                                forecast_result = linear_regression_forecast(aggregated_data, st.session_state.selected_date_col, st.session_state.selected_target_col, periods, aggregation, annual_growth_rate, confidence_level)
+                            elif model_type == "Prophet":
+                                forecast_result = prophet_forecast(aggregated_data, st.session_state.selected_date_col, st.session_state.selected_target_col, periods, aggregation, annual_growth_rate, confidence_level)
+                            elif model_type == "Ensemble":
+                                forecast_result = ensemble_forecast(aggregated_data, st.session_state.selected_date_col, st.session_state.selected_target_col, periods, aggregation, annual_growth_rate, confidence_level)
+                            
+                            if forecast_result:
+                                # Store forecast data
+                                st.session_state.forecast_data = {
+                                    'target_col': st.session_state.selected_target_col,
+                                    'forecast_values': forecast_result['forecast_values'],
+                                    'periods': periods,
+                                    'period_label': period_label,
+                                    'slope': forecast_result['slope'],
+                                    'intercept': forecast_result['intercept'],
+                                    'historical_data': aggregated_data.values.tolist(),
+                                    'forecast_dates': forecast_result['forecast_dates'],
+                                    'model_name': forecast_result['model_name'],
+                                    'r2_score': forecast_result['r2_score'],
+                                    'aggregation': aggregation,
+                                    'annual_growth_rate': annual_growth_rate,
+                                    'confidence_level': confidence_level,
+                                    'original_data': data
+                                }
                         
-                        st.success(f"✅ {model_type} forecast generated successfully!")
-                        st.rerun()
-                    else:
-                        st.error("❌ Failed to generate forecast. Please try again.")
+                                st.success(f"✅ {model_type} forecast generated successfully!")
+                                st.rerun()
+                            else:
+                                st.error("❌ Failed to generate forecast. Please try again.")
         
         # Main content area
         if st.session_state.forecast_data:
@@ -1368,9 +1395,9 @@ def ensure_user_directory(username):
     return user_dir
 
 def get_user_role(username):
-    """Get user role from config"""
+    """Get user role from USERS dictionary"""
     try:
-        return config['credentials']['usernames'][username].get('role', 'customer')
+        return USERS[username].get('role', 'customer')
     except:
         return 'customer'
 
